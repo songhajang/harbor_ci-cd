@@ -42,7 +42,7 @@ jobs:
 
       # 7️⃣ SSH로 서버 접속 후 배포
       - name: SSH into Ubuntu server and deploy
-        uses: appleboy/ssh-action@v1.7.0
+        uses: appleboy/ssh-action@v1.2.1
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -53,3 +53,4 @@ jobs:
             docker stop ${{ secrets.APP_NAME }} || true
             docker rm ${{ secrets.APP_NAME }} || true
             docker run -d --name ${{ secrets.APP_NAME }} -p 8080:8080 ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+
