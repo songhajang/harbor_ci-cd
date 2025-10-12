@@ -12,12 +12,43 @@ jobs:
       # 1️⃣ 소스코드 체크아웃
       - name: Checkout source
         uses: actions/checkout@v4
-        
-      - name: Check HARBOR_URL Secret
+
+      # 2️⃣ JDK 설치 (Java 17) 및 Maven 캐시 설정
+      - name: Set up JDK 17 and Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: maven
+
+      # 3️⃣ Maven으로 Spring Boot JAR 빌드
+      - name: Build Spring Boot JAR
+        run: mvn clean package -DskipTests
+        working-directory: demo
+
+      # 4️⃣ Docker 이미지 빌드
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }} .
+        working-directory: demo
+
+      # 5️⃣ Harbor 로그인
+      - name: Login to Harbor
         run: |
-          if [ -z "${{ secrets.HARBOR_URL }}" ]; then
-            echo "HARBOR_URL is empty"
-            exit 1
-          else
-            echo "HARBOR_URL exists"
-          fi
+          echo "${{ secrets.HARBOR_PASSWORD }}" | docker login ${{ secrets.HARBOR_URL }} -u "${{ secrets.HARBOR_USERNAME }}" --password-stdin
+      # 6️⃣ Docker 이미지 Push
+      - name: Push image to Harbor
+        run: |
+          docker push ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+      # 7️⃣ SSH로 Ubuntu 서버 접속 후 배포
+      - name: SSH into Ubuntu server and deploy
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/deploy
+            docker pull ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+            docker stop ${{ secrets.APP_NAME }} || true
+            docker rm ${{ secrets.APP_NAME }} || true
+            docker run -d --name ${{ secrets.APP_NAME }} -p 8080:8080 ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
