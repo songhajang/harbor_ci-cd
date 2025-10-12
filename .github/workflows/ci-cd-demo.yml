@@ -33,11 +33,10 @@ jobs:
 
       # 5️⃣ Harbor 로그인
       - name: Login to Harbor
-        run: docker login ${{ secrets.HARBOR_URL }} -u "${{ secrets.HARBOR_USERNAME }}" -p "${{ secrets.HARBOR_PASSWORD }}"
+        run: docker login http://${{ secrets.HARBOR_URL }} -u "${{ secrets.HARBOR_USERNAME }}" -p "${{ secrets.HARBOR_PASSWORD }}"
       # 6️⃣ Docker 이미지 Push
       - name: Push image to Harbor
-        run: |
-          docker push ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+        run: docker push ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
       # 7️⃣ SSH로 Ubuntu 서버 접속 후 배포
       - name: SSH into Ubuntu server and deploy
         uses: appleboy/ssh-action@v1.2.1
