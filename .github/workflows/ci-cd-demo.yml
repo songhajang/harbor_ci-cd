@@ -28,8 +28,7 @@ jobs:
 
       # 4️⃣ Docker 이미지 빌드
       - name: Build Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }} .
+        run: docker build -t ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }} .
         working-directory: demo
 
       # 5️⃣ Harbor 로그인
