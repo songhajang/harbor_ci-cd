@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>간단한 테스트 소개 페이지</title>
+  <style>
+    /* Reset-ish */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', 'Helvetica Neue', Arial;line-height:1.45;color:#111;background:linear-gradient(180deg,#f7fbff, #ffffff);}
+
+    /* 레이아웃 */
+    .wrap{max-width:980px;margin:48px auto;padding:28px;border-radius:12px;box-shadow:0 10px 30px rgba(17,24,39,0.06);background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(250,250,255,0.85));}
+    header{display:flex;align-items:center;gap:18px}
+    .logo{width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,#6EE7B7,#3B82F6);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px}
+    h1{font-size:28px;color:#0f172a}
+    p.lead{color:#374151;margin-top:8px}
+
+    /* 카드 그리드 */
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:22px}
+    .card{padding:16px;border-radius:10px;background:linear-gradient(180deg,#ffffff, #f8fafc);border:1px solid rgba(15,23,42,0.04);box-shadow:0 4px 14px rgba(2,6,23,0.04)}
+    .card h3{font-size:16px;margin-bottom:6px;color:#0f172a}
+    .card p{color:#475569;font-size:14px}
+
+    /* CTA */
+    .cta{display:flex;gap:12px;align-items:center;margin-top:22px}
+    .btn{display:inline-block;padding:10px 16px;border-radius:10px;font-weight:600;text-decoration:none}
+    .btn-primary{background:#2563eb;color:white}
+    .btn-ghost{background:transparent;border:1px solid rgba(37,99,235,0.14);color:#2563eb}
+
+    /* footer */
+    footer{margin-top:28px;color:#64748b;font-size:13px}
+
+    /* responsive header on small screens */
+    @media (max-width:520px){
+      header{flex-direction:row;gap:12px}
+      .logo{width:56px;height:56px;font-size:18px}
+      h1{font-size:20px}
+    }
+
+    /* small utilities */
+    .muted{color:#6b7280;font-size:13px}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(37,99,235,0.08);color:#1e3a8a;font-weight:600;font-size:13px}
+  </style>
+</head>
+<body>
+  <main class="wrap" role="main">
+    <header>
+      <div class="logo">TEST</div>
+      <div>
+        <h1>테스트 소개 페이지</h1>
+        <p class="lead">간단하고 깔끔한 HTML/CSS 기반 소개 페이지 예시입니다. 이 파일 하나로 바로 퍼블리싱 가능합니다.</p>
+      </div>
+    </header>
+
+    <section class="cards" aria-label="주요 항목">
+      <article class="card">
+        <h3>목표</h3>
+        <p>이 테스트 페이지는 기능 소개와 주요 흐름을 빠르게 확인하기 위해 설계되었습니다. 반응형이며 접근성을 고려했습니다.</p>
+      </article>
+
+      <article class="card">
+        <h3>사용 방법</h3>
+        <p>이 HTML 파일을 웹 서버에 올리거나 로컬에서 열어 확인하세요. 수정은 주석을 참고하여 간단히 가능합니다.</p>
+      </article>
+
+      <article class="card">
+        <h3>주요 기능</h3>
+        <p>반응형 그리드, CTA(행동유도 버튼), 심플한 스타일 시스템을 포함합니다. 필요에 따라 색상과 내용을 바꿔 사용하세요.</p>
+      </article>
+
+      <article class="card">
+        <h3>확장하기</h3>
+        <p>폼, 모달, 이미지 갤러리 등을 추가하면 실제 퍼블리싱용 소개 페이지로 확장하기 쉽습니다.</p>
+      </article>
+    </section>
+
+    <div class="cta">
+      <a class="btn btn-primary" href="#" onclick="event.preventDefault();alert('여기에 링크를 넣어 퍼널을 연결하세요.');">지금 시작하기</a>
+      <a class="btn btn-ghost" href="#" onclick="event.preventDefault();alert('다운로드 또는 상세 정보를 연결하세요.');">더 알아보기</a>
+      <span class="pill">반응형</span>
+    </div>
+
+    <footer>
+      <p class="muted">© 2025 간단한 테스트 페이지 · 제작자: 당신</p>
+    </footer>
+  </main>
+</body>
+</html>
