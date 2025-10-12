@@ -13,10 +13,10 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
         
-      - name: Check ROBOT_DEMO_CI Secret
+      - name: Check HARBOR_URL Secret
         run: |
-          if [ -z "${{ secrets.ROBOT_DEMO_CI.HARBOR_URL }}" ]; then
-            echo "ROBOT_DEMO_CI is empty"
+          if [ -z "${{ secrets.HARBOR_URL }}" ]; then
+            echo "HARBOR_URL is empty"
             exit 1
           else
             echo "HARBOR_URL exists"
