@@ -33,8 +33,7 @@ jobs:
 
       # 5️⃣ Harbor 로그인
       - name: Login to Harbor
-        run: |
-          echo "${{ secrets.HARBOR_PASSWORD }}" | docker login ${{ secrets.HARBOR_URL }} -u "${{ secrets.HARBOR_USERNAME }}" --password-stdin
+        run: docker login ${{ secrets.HARBOR_URL }} -u "${{ secrets.HARBOR_USERNAME }}" -p {{ secrets.HARBOR_PASSWORD }}
       # 6️⃣ Docker 이미지 Push
       - name: Push image to Harbor
         run: |
