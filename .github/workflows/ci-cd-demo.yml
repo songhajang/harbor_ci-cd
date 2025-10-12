@@ -1,6 +1,5 @@
 name: Spring Boot CI/CD Demo
 
-# main 브랜치에 push될 때 실행
 on:
   push:
     branches: [ "main" ]
@@ -25,11 +24,13 @@ jobs:
       # 3️⃣ Maven으로 Spring Boot JAR 빌드
       - name: Build Spring Boot JAR
         run: mvn clean package -DskipTests
+        working-directory: demo/springboot-app
 
       # 4️⃣ Docker 이미지 빌드
       - name: Build Docker image
         run: |
           docker build -t ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }} .
+        working-directory: demo
 
       # 5️⃣ Harbor 로그인
       - name: Login to Harbor
