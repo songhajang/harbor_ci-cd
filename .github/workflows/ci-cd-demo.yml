@@ -24,7 +24,7 @@ jobs:
       # 3️⃣ Maven으로 Spring Boot JAR 빌드
       - name: Build Spring Boot JAR
         run: mvn clean package -DskipTests
-        working-directory: demo/springboot-app
+        working-directory: demo
 
       # 4️⃣ Docker 이미지 빌드
       - name: Build Docker image
