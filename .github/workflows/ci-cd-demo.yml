@@ -13,11 +13,11 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
         
-      - name: Check DOCKER_REGISTRY Secret
+      - name: Check ROBOT_DEMO_CI Secret
         run: |
-          if [ -z "${{ secrets.DOCKER_REGISTRY }}" ]; then
-            echo "DOCKER_REGISTRY is empty"
+          if [ -z "${{ secrets.ROBOT_DEMO_CI }}" ]; then
+            echo "ROBOT_DEMO_CI is empty"
             exit 1
           else
-            echo "DOCKER_REGISTRY exists"
+            echo "ROBOT_DEMO_CI exists"
           fi
