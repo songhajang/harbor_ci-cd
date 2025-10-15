@@ -31,10 +31,11 @@ jobs:
         run: docker build -t ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }} .
         working-directory: demo
 
+        
       - name: Add Harbor CA certificate
         run: |
-          mkdir -p /etc/docker/certs.d/10.0.2.15
-          echo "${{ secrets.HARBOR_CA_CRT }}" | base64 -d > /etc/docker/certs.d/10.0.2.15/ca.crt
+          sudo mkdir -p /etc/docker/certs.d/10.0.2.15
+          echo "${{ secrets.HARBOR_CA_CRT }}" | base64 -d | sudo tee /etc/docker/certs.d/10.0.2.15/ca.crt > /dev/null
           sudo systemctl restart docker
         shell: bash
 
