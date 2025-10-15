@@ -7,7 +7,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
       # 1️⃣ 소스코드 체크아웃
       - name: Checkout source
@@ -26,26 +26,45 @@ jobs:
         run: mvn clean package -DskipTests
         working-directory: demo
 
-      # 4️⃣ Docker 이미지 빌드
+      # 4️⃣ Docker 설정 (insecure-registry 및 CA 인증서)
+      - name: Configure Docker for Harbor
+        run: |
+          # insecure-registry 설정 (HTTP Harbor용)
+          sudo tee /etc/docker/daemon.json > /dev/null <<EOF
+          {
+            "insecure-registries": ["10.0.2.15", "${{ secrets.DOCKER_REGISTRY }}"]
+          }
+          EOF
+          
+          # CA 인증서 설정 (HTTPS Harbor용)
+          if [ -n "${{ secrets.HARBOR_CA_CRT }}" ]; then
+            sudo mkdir -p /etc/docker/certs.d/10.0.2.15
+            echo "${{ secrets.HARBOR_CA_CRT }}" | base64 -d | sudo tee /etc/docker/certs.d/10.0.2.15/ca.crt > /dev/null
+          fi
+          
+          # Docker 재시작
+          sudo systemctl restart docker
+          
+          # Docker 재시작 대기
+          sleep 5
+
+      # 5️⃣ Docker 이미지 빌드
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }} .
         working-directory: demo
 
-      - name: Add Harbor CA certificate
+      # 6️⃣ Harbor 로그인 (--password-stdin 사용)
+      - name: Login to Harbor
         run: |
-          sudo mkdir -p /etc/docker/certs.d/10.0.2.15
-          echo -n "${{ secrets.HARBOR_CA_CRT }}" | base64 -d | sudo tee /etc/docker/certs.d/10.0.2.15/ca.crt > /dev/null
-          sudo systemctl restart docker
+          echo "${{ secrets.HARBOR_PASSWORD }}" | docker login 10.0.2.15 \
+            -u "${{ secrets.HARBOR_USERNAME }}" \
+            --password-stdin
 
-      - name: Docker Login
-        run:  docker login 10.0.2.15 -u "${{ secrets.HARBOR_USERNAME }}" -p "${{ secrets.HARBOR_PASSWORD }}"
-
-      
-      
-      # 6️⃣ Docker 이미지 Push
+      # 7️⃣ Docker 이미지 Push
       - name: Push image to Harbor
         run: docker push ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
-      # 7️⃣ SSH로 Ubuntu 서버 접속 후 배포
+
+      # 8️⃣ SSH로 Ubuntu 서버 접속 후 배포
       - name: SSH into Ubuntu server and deploy
         uses: appleboy/ssh-action@v1.2.1
         with:
@@ -53,8 +72,27 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Harbor 로그인
+            echo "${{ secrets.HARBOR_PASSWORD }}" | docker login 10.0.2.15 \
+              -u "${{ secrets.HARBOR_USERNAME }}" \
+              --password-stdin
+            
+            # 배포 디렉토리로 이동
             cd /home/ubuntu/deploy
+            
+            # 최신 이미지 Pull
             docker pull ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+            
+            # 기존 컨테이너 중지 및 제거
             docker stop ${{ secrets.APP_NAME }} || true
             docker rm ${{ secrets.APP_NAME }} || true
-            docker run -d --name ${{ secrets.APP_NAME }} -p 8080:8080 ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+            
+            # 새 컨테이너 실행
+            docker run -d \
+              --name ${{ secrets.APP_NAME }} \
+              -p 8080:8080 \
+              --restart unless-stopped \
+              ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+            
+            # 이전 이미지 정리 (선택사항)
+            docker image prune -f
