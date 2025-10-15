@@ -31,9 +31,20 @@ jobs:
         run: docker build -t ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }} .
         working-directory: demo
 
-      # 5️⃣ Harbor 로그인
-      - name: Login to Harbor
-        run: docker login https://${{ secrets.HARBOR_URL }} -u "${{ secrets.HARBOR_USERNAME }}" -p "${{ secrets.HARBOR_PASSWORD }}"
+      - name: Save Harbor CA cert
+        run: |
+          mkdir -p /etc/docker/certs.d/10.0.2.15
+          echo "${{ secrets.HARBOR_CA }}" > /etc/docker/certs.d/10.0.2.15/ca.crt
+          cat /etc/docker/certs.d/10.0.2.15/ca.crt
+
+      - name: Docker Login
+        run: |
+          echo "${{ secrets.HARBOR_PASSWORD }}" | docker login https://10.0.2.15 -u "${{ secrets.HARBOR_USERNAME }}" --password-stdin
+
+      - name: Verify Harbor Access
+        run: curl -v https://10.0.2.15/v2/_catalog --cacert /etc/docker/certs.d/10.0.2.15/ca.crt
+      
+      
       # 6️⃣ Docker 이미지 Push
       - name: Push image to Harbor
         run: docker push ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
