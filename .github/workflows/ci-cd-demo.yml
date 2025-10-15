@@ -39,10 +39,8 @@ jobs:
 
       - name: Docker Login
         run: |
-          echo "${{ secrets.HARBOR_PASSWORD }}" | docker login https://10.0.2.15 -u "${{ secrets.HARBOR_USERNAME }}" --password-stdin
+          echo "${{ secrets.HARBOR_PASSWORD }}" | docker login https://10.0.2.15:443 -u "${{ secrets.HARBOR_USERNAME }}" --password-stdin
 
-      - name: Verify Harbor Access
-        run: curl -v https://10.0.2.15/v2/_catalog --cacert /etc/docker/certs.d/10.0.2.15/ca.crt
       
       
       # 6️⃣ Docker 이미지 Push
